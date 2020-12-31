@@ -28,7 +28,7 @@ def main():
           "The goal of the game is to guess the hidden word")
     print(f"The are {len(word)} letters in a word")
     game_is_running = True
-    while game_is_running and hp > 0:
+    while hp > 0:
         if not is_guessed(word, word_with_closed_letters):
             print(f"{hp} HP left")
             print(f"Word: {*word_with_closed_letters}")
@@ -37,4 +37,8 @@ def main():
                 word_with_closed_letters = unlock_letter(letter)
             else:
                 hp -= 1
-
+        else:
+            print("Congratulations! You won!")
+            break
+    else:
+        print("GAME OVER")
