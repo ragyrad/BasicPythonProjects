@@ -65,8 +65,8 @@ def unlock_letter(letter, secret_word, word: list) -> list:
 
 def main():
     word, word_with_closed_letters = choose_word(WORDS)
-    # heals points equals the length of the word
-    hp = len(word)
+    # heals points equals the length of the word plus five
+    hp = len(word) + 5
     print("Welcome to HANGMAN\n"
           "The goal of the game is to guess the hidden word")
     print(f"The are {len(word)} letters in a word")
