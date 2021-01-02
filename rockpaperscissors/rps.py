@@ -90,6 +90,7 @@ def start_game(event):
     Hide button START GAME and show main label.
     Makes active all buttons.
     """
+    computer_choice_image.configure(image=question_mark_image)
     rock_button.configure(image=rock_image)
     paper_button.configure(image=paper_image)
     scissors_button.configure(image=scissors_image)
