@@ -67,11 +67,11 @@ def make_choice(choice):
         button.configure(state=tk.DISABLED)
 
     if choice == "rock":
-        rock_button.configure(image="activated_rock.png")
+        rock_button.configure(image=activated_rock_image)
     elif choice == "paper":
-        paper_button.configure(image="activated_paper.png")
+        paper_button.configure(image=activated_paper_image)
     elif choice == "scissors":
-        scissors_button.configure(image="activated_scissors.png")
+        scissors_button.configure(image=activated_scissors_image)
     compare_choices(choice)
 
 
@@ -100,12 +100,16 @@ if __name__ == '__main__':
 
     # picture rock
     rock_image = open_and_resize_image("rock.png", IMAGE_WIDTH, IMAGE_HEIGHT)
+    activated_rock_image = open_and_resize_image("activated_rock.png", IMAGE_WIDTH, IMAGE_HEIGHT)
     # picture paper
-    paper_image = open_and_resize_image("paper.png", IMAGE_WIDTH, IMAGE_HEIGHT)  # FIXME change images
+    paper_image = open_and_resize_image("paper.png", IMAGE_WIDTH, IMAGE_HEIGHT)
+    activated_paper_image = open_and_resize_image("activated_paper.png", IMAGE_WIDTH, IMAGE_HEIGHT)
     # picture scissors
     scissors_image = open_and_resize_image("scissors.png", IMAGE_WIDTH, IMAGE_HEIGHT)
+    activated_scissors_image = open_and_resize_image("activated_scissors.png", IMAGE_WIDTH, IMAGE_HEIGHT)
     # question mark image for computer choose
     question_mark_image = open_and_resize_image("question.png", IMAGE_WIDTH, IMAGE_HEIGHT)
+
 
     gaps_between_buttons = (WIDTH - (IMAGE_WIDTH * 3)) // 4
     # Rock button
