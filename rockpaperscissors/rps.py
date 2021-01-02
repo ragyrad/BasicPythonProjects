@@ -65,13 +65,13 @@ def make_choice(choice):
     # Disable all buttons
     for button in rock_button, paper_button, scissors_button:
         button.configure(state=tk.DISABLED)
-    # FIXME add the images
-    # if choice == "rock":
-    #     rock_button.configure(image="")
-    # elif choice == "paper":
-    #     paper_button.configure(image="")
-    # elif choice == "scissors":
-    #     scissors_button.configure(image="")
+
+    if choice == "rock":
+        rock_button.configure(image="activated_rock.png")
+    elif choice == "paper":
+        paper_button.configure(image="activated_paper.png")
+    elif choice == "scissors":
+        scissors_button.configure(image="activated_scissors.png")
     compare_choices(choice)
 
 
