@@ -41,18 +41,25 @@ def main():
     # picture scissors
     scissors_image = open_and_resize_image("scissors.png", IMAGE_WIDTH, IMAGE_HEIGHT)
     # question mark image for computer choose
-    question_mark_image = open_and_resize_image("question.png")
+    question_mark_image = open_and_resize_image("question.png", IMAGE_WIDTH, IMAGE_HEIGHT)
 
-    gaps_between_buttons = (WIDTH - (IMAGE_WIDTH * 3)) // 5
+    gaps_between_buttons = (WIDTH - (IMAGE_WIDTH * 3)) // 4
     # Rock button
     rock_button = tk.Button(root, image=rock_image, command=lambda: print("rock_click"))
     rock_button.place(x=gaps_between_buttons, y=HEIGHT - IMAGE_HEIGHT - 120)
     # Paper button
     paper_button = tk.Button(root, image=paper_image, command=lambda: print("paper click"))
     paper_button.place(x=gaps_between_buttons * 2 + IMAGE_WIDTH, y=HEIGHT - IMAGE_HEIGHT - 120)
-    # # Scissors button
+    # Scissors button
     rock_button = tk.Button(root, image=scissors_image, command=lambda: print("scissors click"))
-    rock_button.place(x=gaps_between_buttons * 3 + IMAGE_WIDTH * 2, y=HEIGHT - IMAGE_HEIGHT - 120)
+    rock_button.place(x=WIDTH - IMAGE_WIDTH - gaps_between_buttons, y=HEIGHT - IMAGE_HEIGHT - 120)
+    # Computer select image
+    question_mark = tk.Label(root, image=question_mark_image, borderwidth=2, relief="solid")
+    question_mark.place(relx=0.5, rely=0.3, anchor=tk.CENTER)
+
+    # The inscription will offer to make a choice, as well as notify about victory or loss.
+    main_lbl = tk.Label(root, text="Choose rock paper or scissors", font=("Arial Bold", 18))
+    main_lbl.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
     root.mainloop()
 
