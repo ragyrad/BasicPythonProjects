@@ -1,4 +1,6 @@
+import random as rnd
 import tkinter as tk
+
 from PIL import Image, ImageTk  # pip install pillow
 
 
@@ -21,11 +23,44 @@ def open_and_resize_image(image_path, width, height):
     return ImageTk.PhotoImage(resized_image)
 
 
-def make_choice(choice):
-    """The function return the player choice and and highlights the pressed image
+def compare_choices(player_choice):
+    """Compare player choice with random computer choice and determines the winner
 
-    :param choice:
-    :return: player choice
+    :param player_choice: player choice
+    """
+    rps = ["rock", "paper", "scissors"]
+    computer_choice = rnd.choice(rps)
+    result = "0"
+    # Change image for computer choice
+    eval(f"computer_choice_image.configure(image={computer_choice}_image)")
+    if computer_choice == player_choice:
+        result = "Draw!"
+    else:
+        if computer_choice == "rock":
+            # computer_choice_image.configure(image=rock_image)
+            if player_choice == "scissors":
+                result = "You lose!"
+            elif player_choice == "paper":
+                result = "You won!"
+        elif computer_choice == "paper":
+            # computer_choice_image.configure(image=paper_image)
+            if player_choice == "rock":
+                result = "You lose!"
+            elif player_choice == "scissors":
+                result = "You won!"
+        elif computer_choice == "scissors":
+            # computer_choice_image.configure(image=scissors_image)
+            if player_choice == "paper":
+                result = "You lose!"
+            elif player_choice == "rock":
+                result = "You won!"
+    main_lbl.configure(text=result)
+
+
+def make_choice(choice):
+    """Call compare_choices() with player choice and and highlights the pressed image.
+
+    :param choice: image which player chose
     """
     # Disable all buttons
     for button in rock_button, paper_button, scissors_button:
@@ -37,8 +72,17 @@ def make_choice(choice):
     #     paper_button.configure(image="")
     # elif choice == "scissors":
     #     scissors_button.configure(image="")
+    compare_choices(choice)
 
-    return choice
+
+def start_game(event):
+    # Hide pressed button
+    event.widget.place_forget()
+    # Show main label text
+    main_lbl.place(relx=0.5, rely=0.53, anchor=tk.CENTER)
+    # Activate choice button
+    for button in rock_button, paper_button, scissors_button:
+        button.configure(state=tk.ACTIVE)
 
 
 if __name__ == '__main__':
@@ -77,12 +121,11 @@ if __name__ == '__main__':
                                 command=lambda choice="scissors": make_choice(choice))
     scissors_button.place(x=WIDTH - IMAGE_WIDTH - gaps_between_buttons, y=HEIGHT - IMAGE_HEIGHT - 120)
     # Computer select image
-    question_mark = tk.Label(root, image=question_mark_image, borderwidth=2, relief="solid")
-    question_mark.place(relx=0.5, rely=0.3, anchor=tk.CENTER)
+    computer_choice_image = tk.Label(root, image=question_mark_image, borderwidth=2, relief="solid")
+    computer_choice_image.place(relx=0.5, rely=0.3, anchor=tk.CENTER)
 
     # The inscription will offer to make a choice, as well as notify about victory or loss.
     main_lbl = tk.Label(root, text="Choose rock paper or scissors", font=("Arial Bold", 18))
-    main_lbl.place(relx=0.5, rely=0.53, anchor=tk.CENTER)
 
     # Start game button
     play_button = tk.Button(root, text="START GAME", font=("Arial Bold", 16))
