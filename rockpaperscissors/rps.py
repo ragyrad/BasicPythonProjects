@@ -55,6 +55,7 @@ def compare_choices(player_choice):
             elif player_choice == "rock":
                 result = "You won!"
     main_lbl.configure(text=result)
+    show_play_button()
 
 
 def make_choice(choice):
@@ -75,7 +76,24 @@ def make_choice(choice):
     compare_choices(choice)
 
 
+def show_play_button():
+    """Makes active play_button also change text to 'Play again'
+    Change main label to 'Choose rock paper or scissors'
+    Changes active button images to normal
+    """
+    play_button.configure(text="Play again")
+    play_button.place(relx=0.5, rely=0.47, anchor=tk.CENTER)
+
+
 def start_game(event):
+    """Reset all button images and change main label to 'Choose rock paper or scissors'
+    Hide button START GAME and show main label.
+    Makes active all buttons.
+    """
+    rock_button.configure(image=rock_image)
+    paper_button.configure(image=paper_image)
+    scissors_button.configure(image=scissors_image)
+    main_lbl.configure(text="Choose rock paper or scissors")
     # Hide pressed button
     event.widget.place_forget()
     # Show main label text
