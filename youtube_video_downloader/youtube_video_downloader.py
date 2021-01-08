@@ -41,9 +41,9 @@ audio_stream = all_streams.filter(mime_type="audio/webm").last()
 
 
 available_qualities = get_qualities(video_streams)
-#
+
 show_qualities(available_qualities)
-#
+
 quality_chosen = False
 while not quality_chosen:
     chosen_quality_idx = int(input(f"Choose quality: "))
