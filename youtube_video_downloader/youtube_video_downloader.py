@@ -2,20 +2,23 @@ import pytube
 from pytube import StreamQuery
 
 
-def get_qualities(video_streams: "StreamQuery") -> list:
+def get_qualities(video_streams: "StreamQuery") -> dict:
     """Return available qualities"""
-    qualities = []
+    qualities = {}
     for quality in video_streams:
-        qualities.append(quality.resolution)
-    qualities.append("audio only")
+        qualities[quality.resolution] = quality.fps
+    qualities["audio only"] = ""
     return qualities
 
 
 def show_qualities(qualities):
     """Show available qualities"""
     i = 1
-    for quality in qualities:
-        print(f"{i} - {quality}")
+    for quality, fps in qualities.items():
+        if quality != "audio only":
+            print(f"{i} - {quality} {fps}fps")
+        else:
+            print(f"{i} - {quality}")
         i += 1
 
 
@@ -48,7 +51,7 @@ quality_chosen = False
 while not quality_chosen:
     chosen_quality_idx = int(input(f"Choose quality: "))
     if chosen_quality_idx in range(1, len(available_qualities) + 1):
-        chosen_quality = available_qualities[chosen_quality_idx - 1]
+        chosen_quality = list(available_qualities.keys())[chosen_quality_idx - 1]
         quality_chosen = True
     else:
         print("Write the index of quality")
