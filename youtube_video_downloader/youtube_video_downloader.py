@@ -1,5 +1,12 @@
+import tkinter as tk
 import pytube
 from pytube import StreamQuery
+
+WIDTH = 800
+HEIGHT = 400
+CHOSEN_VIDEO = None
+CHOSEN_AUDIO = None
+VIDEO_STREAMS = None
 
 
 def get_qualities(video_streams: "StreamQuery") -> list[dict]:
@@ -12,52 +19,88 @@ def get_qualities(video_streams: "StreamQuery") -> list[dict]:
     return qualities
 
 
-def show_qualities(qualities):
-    """Show available qualities"""
-    i = 1
-    for quality in qualities:
-        if quality != "audio only":
-            print(f"{i} - {quality['resolution']} {quality['fps']}fps")
+def fill_quality_listbox(video_streams):
+    """fills the listbox with available video qualities"""
+    qualities = get_qualities(video_streams)
+    listbox.delete(0, tk.END)
+    for q in qualities:
+        if q != "audio only":
+            listbox.insert(tk.END, f'{q["resolution"]} {q["fps"]}fps')
         else:
-            print(f"{i} - {quality}")
-        i += 1
+            listbox.insert(tk.END, "audio only")
 
 
-while True:
+def filter_streams(yt):
+    """filter video streams by mime type mp4 and select one best quality audio stream"""
+    global VIDEO_STREAMS, CHOSEN_AUDIO
+    all_streams = yt.streams
+    VIDEO_STREAMS = all_streams.filter(mime_type="video/mp4", adaptive=True)
+    # audio stream in the best quality
+    CHOSEN_AUDIO = all_streams.filter(mime_type="audio/webm").last()
+    fill_quality_listbox(VIDEO_STREAMS)
+
+
+def find_video(event):
+    """change videname_label and return video"""
     try:
-        video_url = input("Input the link to the video you want to download: ")
+        video_url = message_entry.get()
         yt = pytube.YouTube(video_url)
-        break
+        videoname_label.configure(text=yt.title)
     except pytube.exceptions.RegexMatchError:
-        print(f'The Regex pattern did not return any matches for the video: {video_url}')
+        videoname_label.configure(text='The Regex pattern did not return any matches for this video')
     except pytube.exceptions.ExtractError:
-        print(f'An extraction error occurred for the video: {video_url}')
-
+        videoname_label.configure(text='An extraction error occurred for this video')
     except pytube.exceptions.VideoUnavailable:
-        print(f'The following video is unavailable: {video_url}')
+        videoname_label.configure(text='The following video is unavailable')
+    filter_streams(yt)
 
 
-all_streams = yt.streams
-video_streams = all_streams.filter(mime_type="video/mp4", adaptive=True)
-# audio stream in the best quality
-audio_stream = all_streams.filter(mime_type="audio/webm").last()
-
-available_qualities = get_qualities(video_streams)
-
-show_qualities(available_qualities)
-
-quality_chosen = False
-while not quality_chosen:
-    chosen_quality_idx = int(input(f"Choose quality: "))
-    if chosen_quality_idx in range(1, len(available_qualities) + 1):
-        chosen_quality = available_qualities[chosen_quality_idx]
-        quality_chosen = True
+def choose_video_quality(event):
+    """choose video quality when user click on listbox"""
+    global CHOSEN_AUDIO, CHOSEN_VIDEO, VIDEO_STREAMS
+    download_button.configure(state=tk.ACTIVE)
+    widget = event.widget
+    selection = widget.curselection()
+    picked_quality = widget.get(selection[0])
+    if picked_quality != "audio only":
+        res = picked_quality.split()[0]
+        fps = int(picked_quality.split()[1].replace("fps", ""))
+        CHOSEN_VIDEO = VIDEO_STREAMS.filter(res=res, fps=fps)
     else:
-        print("Write the index of quality")
+        CHOSEN_VIDEO = None
 
-if chosen_quality != "audio only":
-    chosen_quality = chosen_quality['resolution']
-    chosen_stream = video_streams.filter(res=chosen_quality)
-    chosen_stream.first().download()
-# download audio stream anyway
-audio_stream.download()
+
+def download_video(event):
+    """download selected streams"""
+    if CHOSEN_VIDEO is not None:
+        CHOSEN_VIDEO.first().download()
+    CHOSEN_AUDIO.download()
+
+
+if __name__ == '__main__':
+    root = tk.Tk()
+    root.geometry(f'{WIDTH}x{HEIGHT}')
+    root.resizable(width=False, height=False)
+    root.title("VideoDownloader")
+
+    message = tk.StringVar()
+    message_entry = tk.Entry(textvariable=message, width=WIDTH//10)
+    message_entry.place(relx=0.5, rely=0.2, anchor=tk.CENTER)
+
+    input_label = tk.Label(root, text="enter video link:", font=("Arial Bold", 14))
+    input_label.place(relx=0.5, rely=0.13, anchor=tk.CENTER)
+
+    videoname_label = tk.Label(root, text="", font=("Arial Bold", 10))
+    videoname_label.place(relx=0.5, rely=0.27, anchor=tk.CENTER)
+
+    listbox = tk.Listbox(root, width=WIDTH//20, font=("Arial Bold", 12))
+    listbox.place(relx=0.5, rely=0.6, anchor=tk.CENTER)
+
+    download_button = tk.Button(root, text="download", font=("Arial Bold", 12), state=tk.DISABLED)
+    download_button.place(relx=0.5, rely=0.93, anchor=tk.CENTER)
+
+    message_entry.bind('<Return>', find_video)
+    download_button.bind('<Button-1>', download_video)
+    listbox.bind('<<ListboxSelect>>', choose_video_quality)
+
+    root.mainloop()
