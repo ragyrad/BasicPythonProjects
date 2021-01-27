@@ -1,8 +1,8 @@
 import pygame as pg
 from enum import Enum
 
-WIDTH = 800
-HEIGHT = 600
+WIDTH = 1600
+HEIGHT = 900
 FPS = 30
 
 
@@ -17,7 +17,7 @@ class Cell(Enum):
 
 
 class Board:
-    board_cell_size = 10
+    board_cell_size = 20
 
     def __init__(self, width, height):
         self.cells_wide = width // self.board_cell_size
@@ -63,10 +63,10 @@ class Board:
 
 
 class Snake:
-    start_game_length = 5
+    start_snake_len = 5
 
     def __init__(self):
-        self.length =  self.start_game_length
+        self.length =  self.start_snake_len
         self.speed = 1
         self.snake_coords = []
 
@@ -84,21 +84,31 @@ class Snake:
             else:
                 board.board_cells[y][x] = Cell.SNAKE
 
-    def move_snake(self, direction):
+    def move_snake(self, direction, board):
         for i in range(1, len(self.snake_coords)):
             y, x = self.snake_coords[-i - 1]
             self.snake_coords[-i] = [y, x]
+            board_width, board_height = board.get_board_size()
+
         if direction == 'right':
             y, x = self.snake_coords[0]
+            if x >= board_width - 1:
+                x = -1
             self.snake_coords[0] = [y, x + self.speed]
         elif direction == 'left':
             y, x = self.snake_coords[0]
+            if x <= 0:
+                x = board_width
             self.snake_coords[0] = [y, x - self.speed]
         elif direction == 'up':
             y, x = self.snake_coords[0]
+            if y <= 0:
+                y = board_height
             self.snake_coords[0] = [y - self.speed, x]
         elif direction == 'down':
             y, x = self.snake_coords[0]
+            if y >= board_height - 1:
+                y = -1
             self.snake_coords[0] = [y + self.speed, x]
 
 
@@ -139,7 +149,7 @@ class GameManager:
                     self.running = False
 
             if move:
-                snake.move_snake(move)
+                snake.move_snake(move, board)
 
             board.update_board(self.window)
             snake.draw_snake(board)
