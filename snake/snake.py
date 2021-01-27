@@ -1,3 +1,4 @@
+from random import randint
 import pygame as pg
 from enum import Enum
 
@@ -60,6 +61,25 @@ class Board:
 
     def get_board_size(self):
         return self.cells_wide, self.cells_height
+
+
+class Food:
+    def __init__(self):
+        self.food_coords = None
+        self.food_is_exist = False
+
+    def is_exist(self):
+        return self.food_is_exist
+
+    def create_food(self, board_w, board_h):
+        if not self.food_is_exist:
+            self.food_coords = [randint(0, board_h - 1), randint(0, board_w - 1)]
+            self.food_is_exist = True
+
+    def draw_food(self, board):
+        if self.food_coords:
+            y, x = self.food_coords
+            board.board_cells[y][x] = Cell.FOOD
 
 
 class Snake:
@@ -130,6 +150,7 @@ class GameManager:
         snake.create_snake_coords(board_width, board_height)
         snake.draw_snake(board)
         move = None
+        food = Food()
 
         while self.running:
             self.clock.tick(self.fps)
@@ -151,8 +172,12 @@ class GameManager:
             if move:
                 snake.move_snake(move, board)
 
+            if not food.is_exist():
+                food.create_food(board_width, board_height)
+
             board.update_board(self.window)
             snake.draw_snake(board)
+            food.draw_food(board)
             board.draw_board(self.window)
             pg.display.flip()
 
