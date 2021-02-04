@@ -76,10 +76,14 @@ class Food:
             self.food_coords = [randint(0, board_h - 1), randint(0, board_w - 1)]
             self.food_is_exist = True
 
+    def eat_food(self):
+        self.food_is_exist = False
+
     def draw_food(self, board):
         if self.food_coords:
             y, x = self.food_coords
             board.board_cells[y][x] = Cell.FOOD
+
 
 
 class Snake:
@@ -89,6 +93,7 @@ class Snake:
         self.length =  self.start_snake_len
         self.speed = 1
         self.snake_coords = []
+        self.current_direction = None
 
     def create_snake_coords(self, board_width, board_height):
         center_x = board_width // 2
@@ -104,7 +109,22 @@ class Snake:
             else:
                 board.board_cells[y][x] = Cell.SNAKE
 
+    def available_directions(self, direction):
+        available_drctns = []
+        if direction == 'right' or direction == 'left':
+            available_drctns += ['up', 'down', direction]
+        elif direction == 'up' or direction == 'down':
+            available_drctns += ['right', 'left', direction]
+        elif direction == None:
+            available_drctns += ['right', 'up', 'down']
+        return available_drctns
+
     def move_snake(self, direction, board):
+        if direction not in self.available_directions(self.current_direction):
+            direction = self.current_direction
+
+        self.current_direction = direction
+
         for i in range(1, len(self.snake_coords)):
             y, x = self.snake_coords[-i - 1]
             self.snake_coords[-i] = [y, x]
@@ -131,6 +151,27 @@ class Snake:
                 y = -1
             self.snake_coords[0] = [y + self.speed, x]
 
+    def increase_length(self):
+        tail_y, tail_x = self.snake_coords[-1]
+        pretail_y, pretail_x = self.snake_coords[-2]
+        new_cell_coords = []
+        if tail_x == pretail_x:
+            if tail_y > pretail_y:
+                new_cell_coords += [tail_y + 1, tail_x]
+            else:
+                new_cell_coords += [tail_y - 1, tail_x]
+        elif tail_y == pretail_y:
+            if tail_x > pretail_x:
+                new_cell_coords += [tail_y, tail_x + 1]
+            else:
+                new_cell_coords += [tail_y , tail_x - 1]
+        self.snake_coords.append(new_cell_coords)
+        self.length += 1
+
+    def check_food(self, food):
+        if self.snake_coords[0] == food.food_coords:
+            food.eat_food()
+            self.increase_length()
 
 class GameManager:
     def __init__(self, width, height, fps):
@@ -174,6 +215,8 @@ class GameManager:
 
             if not food.is_exist():
                 food.create_food(board_width, board_height)
+
+            snake.check_food(food)
 
             board.update_board(self.window)
             snake.draw_snake(board)
