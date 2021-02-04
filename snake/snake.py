@@ -94,6 +94,7 @@ class Snake:
         self.speed = 1
         self.snake_coords = []
         self.current_direction = None
+        self.is_dead = False
 
     def create_snake_coords(self, board_width, board_height):
         center_x = board_width // 2
@@ -168,12 +169,13 @@ class Snake:
         self.snake_coords.append(new_cell_coords)
         self.length += 1
 
-    def check_food(self, food):
-        if self.snake_coords[0] == food.food_coords:
-            food.eat_food()
-            self.increase_length()
+    def check_death(self):
+        if self.snake_coords[0] in self.snake_coords[1:]:
+            self.is_dead = True
+
 
 class GameManager:
+
     def __init__(self, width, height, fps):
         pg.init()
         self.clock = pg.time.Clock()
@@ -216,7 +218,14 @@ class GameManager:
             if not food.is_exist():
                 food.create_food(board_width, board_height)
 
-            snake.check_food(food)
+            # Snake eat food
+            if snake.snake_coords[0] == food.food_coords:
+                food.eat_food()
+                snake.increase_length()
+
+            snake.check_death()
+            if snake.is_dead:
+                break
 
             board.update_board(self.window)
             snake.draw_snake(board)
